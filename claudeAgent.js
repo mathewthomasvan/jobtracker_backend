@@ -1,4 +1,4 @@
-console.log("CLAUDE AGENT LOADED — NEW VERSION");
+console.log("🔥 CLAUDE AGENT LOADED — NEW VERSION");
 
 import fetch from "node-fetch";
 

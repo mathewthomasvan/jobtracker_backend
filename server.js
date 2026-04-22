@@ -1,3 +1,5 @@
+console.log("🔥 NEW BUILD DEPLOYED:", Date.now());
+
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
