@@ -1,3 +1,5 @@
+console.log("CLAUDE AGENT LOADED — NEW VERSION");
+
 import fetch from "node-fetch";
 
 export async function runClaudeScan() {
