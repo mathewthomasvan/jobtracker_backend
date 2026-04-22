@@ -2,46 +2,19 @@ console.log("🔥 CLAUDE AGENT LOADED — NEW VERSION");
 
 import fetch from "node-fetch";
 
-export async function runClaudeScan() {
+export async function runClaudeScan(jobBoardHTML) {
   const prompt = `
-You are an environmental job‑board scraper. 
-Your task is to scan ALL major environmental job boards in Canada (especially BC) and return ONLY roles that match the user's criteria.
+You are an environmental job extractor.
 
-SCAN THESE JOB BOARDS:
-- https://www.eco.ca/jobboard/
-- https://www.goodwork.ca/jobs
-- https://ca.indeed.com/jobs?q=environmental
-- https://www.linkedin.com/jobs/environmental-jobs/
-- https://www.workbc.ca/careers
-- https://www2.gov.bc.ca/gov/content/careers-myhr/job-seekers/current-job-postings
-- https://metrovancouver.org/about-us/careers
-- https://www.envirocareers.ca/
-- https://www.environmentaljobs.ca/
+You will be given RAW HTML from multiple job boards.
+Your task is to extract ONLY valid environmental management/planning/assessment/analyst roles.
 
-YOUR TARGET ROLES (INCLUDE ONLY):
-- environmental management
-- environmental assessment (EIA)
-- environmental planning
-- environmental policy
-- environmental analyst / data / GIS
-- sustainability analyst (non‑field)
-- climate / adaptation planning
-- A.Ag → P.Ag pathway roles
-- junior/intermediate environmental consultant (office‑leaning)
+HTML INPUT:
+${Object.entries(jobBoardHTML)
+  .map(([url, html]) => `URL: ${url}\nHTML:\n${html.slice(0, 5000)}\n---`)
+  .join("\n")}
 
-EXCLUDE (DO NOT RETURN):
-- technician roles
-- field roles
-- contaminated sites
-- Indigenous engagement
-- construction monitoring
-- fisheries/wildlife technician
-- restoration fieldwork
-- sampling, monitoring, boots‑on‑ground roles
-- anything requiring RPBio, PBiol, or heavy fieldwork
-
-RETURN STRICT JSON ONLY.
-FORMAT:
+RETURN STRICT JSON ONLY:
 [
   {
     "title": "",
@@ -57,35 +30,12 @@ FORMAT:
   }
 ]
 
-TIER RULES:
-1 = Perfect match (environmental mgmt, assessment, planning, analyst)
-2 = Acceptable match (office‑leaning consultant roles)
-3 = Weak match (only include if borderline acceptable)
-
-EXAMPLES OF GOOD ROLES:
-- Environmental Planner (City of Vancouver)
-- Environmental Assessment Specialist (Urban Systems)
-- Environmental Analyst (Hatfield)
-- Climate & Sustainability Analyst (Metro Vancouver)
-- Environmental Management Coordinator (BC Gov)
-
-EXAMPLES OF BAD ROLES (DO NOT RETURN):
-- Environmental Technician
-- Field Technician
-- Fisheries Technician
-- Restoration Technician
-- Environmental Monitor
-- Construction Monitor
-- Contaminated Sites Technician
-
-IF A JOB BOARD CANNOT BE ACCESSED:
-- Skip it silently
-- Still return valid JSON
-
-IF NO JOBS FOUND:
-Return an empty array: []
-
-DO NOT RETURN ANY TEXT OUTSIDE THE JSON ARRAY.
+RULES:
+- Extract ONLY real jobs found in the HTML.
+- DO NOT hallucinate.
+- If a job board has no valid roles, skip it.
+- If no jobs found at all, return [].
+- DO NOT return text outside the JSON array.
 `;
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -112,4 +62,3 @@ DO NOT RETURN ANY TEXT OUTSIDE THE JSON ARRAY.
     return [];
   }
 }
-

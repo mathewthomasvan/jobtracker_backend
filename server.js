@@ -2,6 +2,7 @@ console.log("🔥 NEW BUILD DEPLOYED:", Date.now());
 
 import express from "express";
 import cors from "cors";
+import { getAllJobBoardHTML } from "./scrapeBoards.js";
 import { runClaudeScan } from "./claudeAgent.js";
 
 const app = express();
@@ -18,7 +19,9 @@ app.get("/jobs", async (req, res) => {
 
 app.post("/scan", async (req, res) => {
   try {
-    const results = await runClaudeScan();
+    const html = await getAllJobBoardHTML();
+    const results = await runClaudeScan(html);
+
     res.json({ status: "ok", results });
   } catch (err) {
     console.error("Scan error:", err);
@@ -28,3 +31,4 @@ app.post("/scan", async (req, res) => {
 
 // Required for Vercel serverless
 export default app;
+
