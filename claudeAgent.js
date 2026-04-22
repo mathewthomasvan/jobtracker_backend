@@ -50,5 +50,14 @@ Return JSON only:
   });
 
   const data = await response.json();
-  return JSON.parse(data.content[0].text);
+
+  // basic safety: if Claude returns non-JSON, avoid crashing
+  const text = data?.content?.[0]?.text || "[]";
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("Failed to parse Claude JSON:", e, text);
+    return [];
+  }
 }
+
